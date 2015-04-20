@@ -6,7 +6,7 @@
     "twitter": "tjanczuk"
   },
   "version": "0.1.0-pre",
-  "description": "Droplet: a small drop from a token bucket",
+  "description": "Droplet: small drop from a token bucket",
   "tags": [
     "token",
     "bucket",
@@ -26,7 +26,7 @@
     }
   ],
   "dependencies": {
-    "edge-cs": "0.2.7",
+    "edge-cs": "0.2.7"
   },
   "homepage": "https://github.com/tjanczuk/droplet",
   "repository": {
