@@ -1,8 +1,14 @@
 #!/usr/bin/env node
 
-require('../lib/droplet').create_server({
-    port: process.env.PORT || 3000
-}, function (error) {
-    if (error) throw error;
-    console.log('Droplet server listening on port ' + process.env.PORT || 3000);
+var options = {
+    port: process.env.PORT || 3000,
+    logger: require('bunyan').createLogger({ name: 'droplet' })
+};
+
+require('../lib/droplet').create_server(options, function (error) {
+    if (error) {
+        options.logger.error(error, 'droplet server failed to establish listener');
+        throw error;
+    }
+    options.logger.warn({ port: options.port }, 'droplet server started');
 });

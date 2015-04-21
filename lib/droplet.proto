@@ -1,0 +1,22 @@
+package Droplet;
+
+message Request {    
+    required string bucket = 1; // bucket name to use
+    required string id = 2; // for logging purposes
+    optional uint32 ls = 3 [default=0]; // per second limit
+    optional uint32 lm = 4 [default=0]; // per minute limit
+    optional uint64 lh = 5 [default=0]; // per hour limit
+    optional uint64 ld = 6 [default=0]; // per day limit
+    optional uint64 lw = 7 [default=0]; // per week limit
+    optional uint64 lo = 8 [default=0]; // per month limit
+}
+
+message Response {    
+    required bool accept = 1; // request meets limit requirements
+    optional int32 ls = 2 [default=0]; // per second token balance
+    optional int32 lm = 3 [default=0]; // per minute token balance
+    optional int64 lh = 4 [default=0]; // per hour token balance
+    optional int64 ld = 5 [default=0]; // per day token balance
+    optional int64 lw = 6 [default=0]; // per week token balance
+    optional int64 lo = 7 [default=0]; // per month token balance
+}
