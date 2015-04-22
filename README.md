@@ -18,17 +18,13 @@ npm install droplet
 On the server:
 
 ```javascript
-var droplet = require('droplet');
-
-var server = droplet.create_server({ port: 3000 });
+var server = require('droplet').create_server({ port: 3000 });
 ```
 
 On the client:
 
-```javacript
-var droplet = require('droplet');
-
-var client = droplet.create_client({ url: 'ws://localhost:3000' });
+```javascript
+var client = require('droplet').create_client({ url: 'ws://localhost:3000' });
 
 client.take({ bucket: 'foo', ls: 100 }, function (error, result) {
     if (error) throw error;
