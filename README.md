@@ -17,7 +17,7 @@ The [request](https://github.com/tjanczuk/droplet/blob/master/lib/droplet.proto)
 
 For example, the client can specify the following request:
 
-```json
+```javascript
 { bucket="foo", ls: 100, lm: 500 }
 ```
 
@@ -29,7 +29,7 @@ The server responds to the client with a [response](https://github.com/tjanczuk/
 
 A server response to the request above may look like this:
 
-```json
+```javascript
 { accept: true, ls: 57, lm: 200 }
 ```
 
