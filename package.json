@@ -44,5 +44,8 @@
   },
   "bin": {
     "droplet": "./bin/droplet.js"
+  },
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha"
   }
 }
