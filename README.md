@@ -7,6 +7,35 @@ Droplet server is a zero-configuration server which allows buckets to be defined
 
 Droplet provides a Node.js server that implements the token bucket logic, and a Node.js client library to communicate with the server. Droplet defines a [Protocol Buffers](https://developers.google.com/protocol-buffers/) over [WebSockets](http://en.wikipedia.org/wiki/WebSocket) protocol that allows non-Node.js clients to communicate with the droplet server.
 
+### Getting started
+
+Install droplet:
+
+```
+npm install droplet
+```
+
+On the server:
+
+```javascript
+var droplet = require('droplet');
+
+var server = droplet.create_server({ port: 3000 });
+```
+
+On the client:
+
+```javacript
+var droplet = require('droplet');
+
+var client = droplet.create_client({ url: 'ws://localhost:3000' });
+
+client.take({ bucket: 'foo', ls: 100 }, function (error, result) {
+    if (error) throw error;
+    console.log('Accepted: ', result.accept);
+});
+```
+
 ### Model
 
 Droplet server maintains a number of named token buckets. Each token bucket represents an instance of a resource you want to enforce rate limits for. It can be an application, a user, an API, a database, etc. Each token bucket can be configured with a separate token limit for different time units: second, minute, hour, day, week, and month. When the droplet server starts, it does not contain any predefined token buckets. Token buckets and their limits can be created and configured or reconfigured dynamically after the droplet server has started. 
