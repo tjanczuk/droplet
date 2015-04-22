@@ -30,6 +30,10 @@
     "protobufjs": "^4.0.0-b2",
     "ws": "^0.7.1"
   },
+  "devDependencies": {
+    "async": "^0.9.0",
+    "mocha": "^2.2.4"
+  },
   "homepage": "https://github.com/tjanczuk/droplet",
   "repository": {
     "type": "git",
