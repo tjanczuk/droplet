@@ -18,7 +18,7 @@ The [request](https://github.com/tjanczuk/droplet/blob/master/lib/droplet.proto)
 For example, the client can specify the following request:
 
 ```javascript
-{ bucket="foo", ls: 100, lm: 500 }
+{ bucket: 'foo', ls: 100, lm: 500 }
 ```
 
 This request indicates that the client would like to remove 1 token from the token bucket named *foo* as long as the number of tokens associated with the per second (*ls*) and per minute (*lm*) limits are sufficient. Moreover, this request also informs the server to set the per second and per minute limits in the token bucket *foo* to 100 and 500, respectively. If the server does not maintain a token bucket *foo* yet, it will create one using these values. Otherwise it will reconfigure an existing token bucket *foo* to use these limits going forward. The limits specify how many tokens the server will be adding to the token bucket per specific unit of time. The *ls=100* value requires the server to add 100 tokens *every second* to the per-second balance associated with the *foo* token bucket. The balance of tokens per every period limit can never exceed the preconfigured limit for that period. Tokens are pro-rated on a millisecond basis. 
