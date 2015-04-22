@@ -23,7 +23,7 @@ For example, the client can specify the following request:
 
 This request indicates that the client would like to remove 1 token from the token bucket named *foo* as long as the number of tokens associated with the per second (*ls*) and per minute (*lm*) limits are sufficient. Moreover, this request also informs the server to set the per second and per minute limits in the token bucket *foo* to 100 and 500, respectively. If the server does not maintain a token bucket *foo* yet, it will create one using these values. Otherwise it will reconfigure an existing token bucket *foo* to use these limits going forward. The limits specify how many tokens the server will be adding to the token bucket per specific unit of time. The *ls=100* value requires the server to add 100 tokens *every second* to the per-second balance associated with the *foo* token bucket. The balance of tokens per every period limit can never exceed the preconfigured limit for that period. Tokens are pro-rated on a millisecond basis. 
 
-The server attempts to remove the specified number of tokens for every limit the request specifies in the named token bucket indicated by the request. Only the numer of tokens for every limit is sufficient will the operation succeed. 
+The server attempts to remove the specified number of tokens for every limit the request specifies in the named token bucket indicated by the request. Only if the number of tokens for every limit is sufficient will the operation succeed. 
 
 The server responds to the client with a [response](https://github.com/tjanczuk/droplet/blob/master/lib/droplet.proto) message. The message indicates whether the request can be accepted or should be rejected due to insufficient amount of tokens. It also specifies the current number of tokens for the limits the client specified in the corresponding request.
 
@@ -35,9 +35,9 @@ A server response to the request above may look like this:
 
 This indicates the request meets the rate requirements for the named token bucket. Current balance of tokens per second and per minute associated with the token bucket is 57 and 200, respectively. 
 
-### Deployment overview
+### Deployment
 
-The droplet server maintains in-memory state and must be deployed as a singleton on a farm of servers the offers rate limited resources. Each of the application servers in the farm acts as a droplet client and must establish a single websocket connection to the droplet server. 
+The droplet server maintains in-memory state and must be deployed as a singleton on a farm of servers that need to rate limit access to resources. Each of the application server in the farm acts as a droplet client and must establish a websocket connection to the droplet server. 
 
 ### Server
 
@@ -50,20 +50,20 @@ droplet
 
 This will start the droplet server listening for webosocket connections on port 3000. You can customize the port number with the `PORT` environment variable. 
 
-The droplet Node.js module also offers a *create_server* function which can be used to customize the droplet server: 
+The droplet Node.js module also offers a *create_server* function which can be used to further customize the droplet server: 
 
-```javasctipt
+```javascript
 var droplet = require('droplet');
 
 var server = droplet.create_server({
-    // required, listen port
+    // required, websocket listen port
     port: 3000,
 
     // optional, bunyan logger; if not specified a default will be created
     logger: null,
 
     // optional, interval in seconds at which to review and remove token 
-    // buckets that accumulated the number of tokens equal to the limit 
+    // buckets that accumulated the number of tokens equal or exceeding the limit 
     // for each configured period; by default 60
     cleanup_interval: 60
 
@@ -84,7 +84,7 @@ The droplet server maintains in-memory state. Restarts of the sever will cause t
 
 ### Client
 
-The Node.js client implements the droplet protocol. It has a built-in server re-connect feature with exponential backoff and the ability to cache requests while the connection is under way.
+The Node.js client implements the droplet protocol. In addition it has a built-in server re-connect feature with exponential backoff and the ability to cache requests while the connection is under way.
 
 This is how you create the client:
 
@@ -101,7 +101,7 @@ var client = droplet.create_client({
     // optional, maximum server reconnect attempts; default 15
     max_reconnect: 15,
 
-    // optional, delay to subsequent reconnect attempt in ms; default 500ms
+    // optional, delay for first reconnect attempt in ms; default 500ms
     reconnect_delay: 500,
 
     // optional, backoff multiplier for subsequent reconnect delays; default 1.2
@@ -146,6 +146,7 @@ client.take({
 
     // optional, per month quota of tokens; default undefined
     lo: 0
+
 }, function (error, result) {
     // error - error communicating with droplet server
     // result.accept == { true | false } - request satisfies rate limits
@@ -153,6 +154,7 @@ client.take({
     //                         within the token bucket named in the request;
     //                         only periods listed in the request are set
 });
+```
 
 The droplet client also exposes the *close* function which terminates the connection with the droplet server:
 
@@ -186,9 +188,9 @@ If the server has state associated with the token bucket named in the request, a
 
 If the server does not maintain any state for the token bucket named in the request, it will dynamically initialize it. 
 
-The server will set new period limits for the named token bucket using values specified in *l{s|m|h|d|w|o}*. If the limits had not been set before, the token balances associated with those period limits will be set to the value of the limit itself. If the limits had been set before, the balances remain unchanged. 
+The server will set new period limits for the named token bucket using values specified in *l{s|m|h|d|w|o}*. If the given limit had not been set before, the token balance associated with that period will be set to the value of the limit itself. If the limit had been set before, the balance remains unchanged. 
 
-The server will attempt to establish the current balance of tokens for every period listed with the request. Only if the balance is larger or equal to *count* for every period listed in the request, the generated respons will allow the request to proceed. 
+The server will attempt to establish the current balance of tokens for every period listed with the request. Only if the balance is larger or equal to *count* for every period listed in the request, the generated response will allow the request to proceed. 
 
 If the request is allowed to proceed, the balance of tokens for every period configured in the named token bucket on the server (wich can be a superset of every period listed in the request) will be reduced the *count* amount. 
 
@@ -196,8 +198,15 @@ If the request is allowed to proceed, the balance of tokens for every period con
 
 The [response](https://github.com/tjanczuk/droplet/blob/master/lib/droplet.proto) message semantic is as follows:
 
-* *accept* always present; true or false; indicates whether the reqeust satisies the rate limits.  
-* *l{s|m|h|d|w|o}* always present for the limits listed in the corresponding reqeust; indicates the balance of tokens for respective time period within the named token bucket listed in the request.
+* *accept* always present; true or false; indicates whether the reqeust satisfies the rate limits.  
+* *l{s|m|h|d|w|o}* always present for the limits listed in the corresponding request; indicates the balance of tokens for respective time period within the named token bucket listed in the request.
+
+## Tests
+
+```
+npm install
+npm test
+```
 
 ## Feedback
 
