@@ -11,6 +11,11 @@ message Request {
     optional uint32 ld = 8 [default=0]; // per day limit
     optional uint32 lw = 9 [default=0]; // per week limit
     optional uint32 lo = 10 [default=0]; // per month limit
+    enum Type {
+        TAKE = 0;
+        QUERY = 1;
+    }
+    optional Type type = 11 [default=TAKE];
 }
 
 message Response {    

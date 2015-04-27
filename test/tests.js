@@ -208,6 +208,41 @@ describe('protocol', function () {
         });
     });
 
+    it('query works', function (done) {
+        var server, client;
+        async.series([
+            function (callback) {
+                server = droplet.create_server({ port: 31415, logger: no_log }, callback);
+            },
+            function (callback) {
+                client = droplet.create_client({ 
+                    url: 'ws://localhost:31415',
+                    logger: no_log
+                });
+                client.take({ id: 'foo', bucket: 'auth0', lm: 10, lh: 10 });
+                client.take({ id: 'bar', bucket: 'auth0', lm: 10 });
+                client.take({ id: 'baz', bucket: 'auth0', lh: 10 });
+                client.query({ id: 'q', bucket: 'auth0' }, function (error, result) {
+                    try {
+                        assert.ifError(error);
+                        assert.ok(result);
+                        assert.equal(typeof result, 'object');
+                        assert.equal(result.accept, undefined);
+                        assert.equal(result.lm, 7);
+                        assert.equal(result.lh, 7);
+                    } catch (e) {
+                        error = e;
+                    }
+                    callback(error);
+                });
+            }
+        ], function (error) {
+            if (client) client.close();
+            if (server) server.close();
+            done(error);
+        });
+    });
+
     it('time credits do accumulate', function (done) {
         var server, client;
         async.series([
